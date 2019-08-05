@@ -9,7 +9,7 @@
 #include <chrono>
 #include <set>
 
-const char* CommandsNames[9] =
+const char* CommandsNames[10] =
 {
 "",
 "un-nou-inceput",
@@ -19,6 +19,7 @@ const char* CommandsNames[9] =
 "statut",
 "scoate",
 "scb",
+"rastoarna",
 "", //end
 };
 
@@ -37,13 +38,13 @@ void(*CommandsHelp[])() =
 	[]() {ilog("Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire", "Declaratie: statut <facultativ>\"nume pivnita\""); },
 	[]() {ilog("Aceasta comanda scoate fisiere din pravalie", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
 	[]() {ilog("Sterge cu buretele", "Declaratie: scb"); },
+	[]() {ilog("Intoarce la o savarsire mai vechie", "Declaratie: rastoarna \"nume savarsire\""); },
 	[]() {},
 
 };
 
 void init(const char* c, int pos)
 {
-	std::cout << "init\n";
 
 	auto args = parseStrings(&c[pos]);
 
@@ -56,7 +57,7 @@ void init(const char* c, int pos)
 
 	if(GetFileAttributes(".gat") == INVALID_FILE_ATTRIBUTES)
 	{
-		glog("niciun director gasit, creand unul...");
+		llog("niciun director gasit, creand unul...");
 
 		CreateDirectory(".gat", nullptr);
 
@@ -114,7 +115,7 @@ void ajutorf(const char* c, int pos)
 
 void savarsestef(const char* c, int pos)
 {
-	std::cout << "in curs de savarsire...\n";
+	
 
 	auto args = parseStrings(&c[pos]);
 	if (args.size() == 0)
@@ -131,6 +132,8 @@ void savarsestef(const char* c, int pos)
 		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
 		return;
 	}
+
+	llog("in curs de savarsire...");
 
 	std::string name;
 	std::string path;
@@ -362,5 +365,81 @@ void scoatef(const char * c, int pos)
 	{
 		f << i << "\n";
 	}
+
+}
+
+void rastoarnaf(const char * c, int pos)
+{
+	
+	auto args = parseStrings(&c[pos]);
+	if (args.size() == 0)
+	{
+		sintaxaInvalida();
+		CommandsHelp[Commands::rastoarna]();
+		return;
+	}
+
+	//verificare daca exista repository
+	std::ifstream f(".gat/config.txt");
+	if (!f.is_open())
+	{
+		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		return;
+	}
+
+	
+
+	std::string name;
+	std::string path;
+
+	f >> name;
+	///"cloud" path
+	f >> path;
+
+	f.close();
+
+	f.open(".gat/adauga.txt");
+	if (!f.is_open())
+	{
+		elog("pravalie corupta");
+		return;
+	}
+
+	std::set<std::string> adaugari;
+
+	while (!f.eof())
+	{
+		std::string s;
+		std::getline(f, s);
+		if (s != "")
+		{
+			adaugari.emplace(std::move(s));
+		}
+	}
+
+	f.close();
+
+	if (adaugari.size() == 0)
+	{
+		elog("niciun fisier adaugat in adauga");
+		return;
+	}
+
+	if(!std::filesystem::exists(path + "/" + args[0]))
+	{
+		elog("savarsire nu exista");
+		return;
+	}
+
+	llog("in curs de rasturnare...\n");
+	for (auto &i : adaugari)
+	{
+		if(CopyFileA((path + "/" + args[0] +"/"+ i).c_str(), (i).c_str(), 0) != 0)
+		{
+			ilog("Rasturnat fisier", i);
+		}
+	}
+
+	llog("Fisiere rasturnate");
 
 }

@@ -92,6 +92,9 @@ void execute(Commands command, const char *c, int &pos)
 	case scb:
 		system("cls");
 		break;
+	case rastoarna:
+		rastoarnaf(c, pos);
+		break;
 	case CommandsSize:
 		break;
 	default:
