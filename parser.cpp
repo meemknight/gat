@@ -76,6 +76,8 @@ void execute(Commands command, const char *c, int &pos)
 	case ajutor:
 		ajutorf(c, pos);
 		break;
+	case savarsire:
+		savarsestef(c, pos);
 	case CommandsSize:
 		break;
 	default:
