@@ -11,4 +11,8 @@ bool validate(const char *c, int &pos);
 
 Commands parseCommandType(const char *c, int &pos);
 
+Commands getCommandType(std::string &s);
+
+bool isBreakChar(char c);
+
 void execute(Commands command, const char *c, int &pos);
