@@ -7,13 +7,18 @@
 #include <fstream>
 #include <filesystem>
 #include <chrono>
+#include <set>
 
-const char* CommandsNames[5] =
+const char* CommandsNames[9] =
 {
 "",
 "un-nou-inceput",
 "arata-mi-calea",
 "savarseste",
+"adauga",
+"statut",
+"scoate",
+"scb",
 "", //end
 };
 
@@ -27,7 +32,11 @@ void(*CommandsHelp[])() =
 	[]() {sintaxaInvalida(); },
 	[]() {ilog("Initializeaza pravalia pentru cod.", "Declaratie: un-nou-inceput \"nume\" <facultativ>\"posizitie pravalie\""); },
 	[]() {ilog("Afiseaza ajutor pentru comenzi. ", "Declaratie: arata-mi-calea \"nume comanda\""); },
-	[]() {ilog("Aceasta comanda urca noua versiune", "Declaratie: savarseste \"nume savarsire\""); },
+	[]() {ilog("Aceasta comanda urca noua versiune in pravalie", "Declaratie: savarseste \"nume savarsire\""); },
+	[]() {ilog("Aceasta comanda adauga fisiere pentru a fi bagate in pravalie", "Declaratie: adauga <nr nelimitat parametri>\"nume fisier\""); },
+	[]() {ilog("Aceasta comanda afiseaza fisierele care apar in adauga.txt", "Declaratie: statut"); },
+	[]() {ilog("Aceasta comanda scoate fisiere din pravalie", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
+	[]() {ilog("Sterge cu buretele", "Declaratie: scb"); },
 	[]() {},
 
 };
@@ -88,7 +97,19 @@ void init(const char* c, int pos)
 void ajutorf(const char* c, int pos)
 {
 	auto a = parseCommandType(c, pos);
-	CommandsHelp[a]();
+	if(a == Commands::none)
+	{
+		for(int i=1; i< Commands::CommandsSize; i++)
+		{
+			ilog(CommandsNames[i]);
+			CommandsHelp[i]();
+			ilog();
+		}
+
+	}else
+	{
+		CommandsHelp[a]();
+	}
 }
 
 void savarsestef(const char* c, int pos)
@@ -115,6 +136,7 @@ void savarsestef(const char* c, int pos)
 	std::string path;
 
 	f >> name;
+	///"cloud" path
 	f >> path;
 
 	f.close();
@@ -126,7 +148,7 @@ void savarsestef(const char* c, int pos)
 		return;
 	}
 
-	std::vector<std::string> adaugari;
+	std::set<std::string> adaugari;
 
 	while(!f.eof())
 	{
@@ -134,7 +156,7 @@ void savarsestef(const char* c, int pos)
 		std::getline(f, s);
 		if (s != "")
 		{
-			adaugari.push_back(std::move(s));
+			adaugari.emplace(std::move(s));
 		}
 	}
 
@@ -151,7 +173,8 @@ void savarsestef(const char* c, int pos)
 		elog("savarsirea deja exista");
 		return;
 	}
-	
+
+	CreateDirectory((path).c_str(), nullptr);
 	CreateDirectory((path + "//" + args[0]).c_str(), nullptr);
 
 	std::ofstream of((path + "//" + args[0] + "//" + "gat.txt").c_str());
@@ -167,6 +190,127 @@ void savarsestef(const char* c, int pos)
 
 	of.close();
 
-	//todo add files
+
+	for (auto &i : adaugari) 
+	{
+		if(CopyFileA(i.c_str(), (path + "//" + args[0] + "//" + i).c_str(), false) != 0)
+		glog("Urcat fisierul: ", i);
+	}
+
+}
+
+void adaugaf(const char *c, int pos)
+{
+	llog("adauga...");
+
+	auto args = parseStrings(&c[pos]);
+	if (args.size() == 0)
+	{
+		sintaxaInvalida();
+		CommandsHelp[Commands::adauga]();
+		return;
+	}
+
+	if(!std::filesystem::exists(".gat//adauga.txt"))
+	{
+		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		return;
+	}
+
+	std::set<std::string> comenzi;
+	std::ifstream file(".gat//adauga.txt");
+		
+	while (!file.eof())
+	{
+		std::string s;
+		std::getline(file, s);
+		if (s != "")
+		{
+			comenzi.emplace(std::move(s));
+		}
+	}
+	file.close();
+
+	for(auto &i: args)
+	{
+		comenzi.emplace(i);
+	}
+
+	std::ofstream of(".gat//adauga.txt");
+
+	for(auto &i: comenzi)
+	{
+		of << i << "\n";
+	}
+
+}
+
+void statutf(const char * c, int pos)
+{
+	if (!std::filesystem::exists(".gat//adauga.txt"))
+	{
+		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		return;
+	}
+
+	std::ifstream f(".gat//adauga.txt");
+	llog("Fisiere din adauga:");
+
+	while (!f.eof())
+	{
+		std::string s;
+		std::getline(f, s);
+		if (s != "")
+		{
+			ilog(s);
+		}
+	}
+
+	f.close();
+
+}
+
+void scoatef(const char * c, int pos)
+{
+	llog("scoate...");
+	auto args = parseStrings(&c[pos]);
+	if (args.size() == 0)
+	{
+		sintaxaInvalida();
+		CommandsHelp[Commands::scoate]();
+		return;
+	}
+
+	if (!std::filesystem::exists(".gat//adauga.txt"))
+	{
+		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		return;
+	}
+
+	std::ifstream file(".gat//adauga.txt");
+	std::set<std::string> comenzi;
+
+	while (!file.eof())
+	{
+		std::string s;
+		std::getline(file, s);
+		if (s != "")
+		{
+			comenzi.emplace(std::move(s));
+		}
+	}
+	file.close();
+
+
+	for(auto &i: args)
+	{
+		comenzi.erase(comenzi.find(i));
+	}
+
+	std::ofstream f(".gat//adauga.txt");
+	for (auto &i : comenzi)
+	{
+		f << i << "\n";
+	}
 
 }

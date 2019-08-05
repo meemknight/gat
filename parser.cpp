@@ -79,6 +79,19 @@ void execute(Commands command, const char *c, int &pos)
 		break;
 	case savarsire:
 		savarsestef(c, pos);
+		break;
+	case adauga:
+		adaugaf(c, pos);
+		break;
+	case statut:
+		statutf(c, pos);
+		break;
+	case scoate:
+		scoatef(c, pos);
+		break;
+	case scb:
+		system("cls");
+		break;
 	case CommandsSize:
 		break;
 	default:
