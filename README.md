@@ -9,3 +9,4 @@ Funcții:
 * statut <facultativ>"nume pivnita": Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire
 * scoate <nr nelimitat parametri>"nume fisier"
 * scb: Sterge cu buretele
+* rastoarna "nume savarsire" : Intoarce la o savarsire mai vechie

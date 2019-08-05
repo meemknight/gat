@@ -31,14 +31,14 @@ void sintaxaInvalida()
 void(*CommandsHelp[])() =
 {
 	[]() {sintaxaInvalida(); },
-	[]() {ilog("Initializeaza pravalia pentru cod.", "Declaratie: un-nou-inceput \"nume\" <facultativ>\"posizitie pravalie\""); },
-	[]() {ilog("Afiseaza ajutor pentru comenzi. ", "Declaratie: arata-mi-calea <facultativ>\"nume comanda\""); },
-	[]() {ilog("Aceasta comanda urca noua versiune in pravalie", "Declaratie: savarseste \"nume savarsire\""); },
-	[]() {ilog("Aceasta comanda adauga fisiere pentru a fi bagate in pravalie", "Declaratie: adauga <nr nelimitat parametri>\"nume fisier\""); },
-	[]() {ilog("Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire", "Declaratie: statut <facultativ>\"nume pivnita\""); },
-	[]() {ilog("Aceasta comanda scoate fisiere din pravalie", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
-	[]() {ilog("Sterge cu buretele", "Declaratie: scb"); },
-	[]() {ilog("Intoarce la o savarsire mai vechie", "Declaratie: rastoarna \"nume savarsire\""); },
+	[]() {llog("Initializeaza pravalia pentru cod.", "Declaratie: un-nou-inceput \"nume\" <facultativ>\"posizitie pravalie\""); },
+	[]() {llog("Afiseaza ajutor pentru comenzi. ", "Declaratie: arata-mi-calea <facultativ>\"nume comanda\""); },
+	[]() {llog("Aceasta comanda urca noua versiune in pravalie", "Declaratie: savarseste \"nume savarsire\""); },
+	[]() {llog("Aceasta comanda adauga fisiere pentru a fi bagate in pravalie", "Declaratie: adauga <nr nelimitat parametri>\"nume fisier\""); },
+	[]() {llog("Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire", "Declaratie: statut <facultativ>\"nume pivnita\""); },
+	[]() {llog("Aceasta comanda scoate fisiere din pravalie", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
+	[]() {llog("Sterge cu buretele", "Declaratie: scb"); },
+	[]() {llog("Intoarce la o savarsire mai vechie", "Declaratie: rastoarna \"nume savarsire\""); },
 	[]() {},
 
 };
@@ -59,7 +59,7 @@ void init(const char* c, int pos)
 	{
 		llog("niciun director gasit, creand unul...");
 
-		CreateDirectory(".gat", nullptr);
+		std::filesystem::create_directory(".gat");
 
 	}
 
@@ -78,9 +78,9 @@ void init(const char* c, int pos)
 		}
 
 		if(GetFileAttributes(pravalie.c_str()) == INVALID_FILE_ATTRIBUTES)
-		if (!CreateDirectory(pravalie.c_str(), nullptr))
+		if (!std::filesystem::create_directory(pravalie.c_str()))
 		{
-			elog("locvatie pravalie invalid");
+			elog("locatie pravalie invalida");
 			return;
 		};
 
@@ -115,7 +115,6 @@ void ajutorf(const char* c, int pos)
 
 void savarsestef(const char* c, int pos)
 {
-	
 
 	auto args = parseStrings(&c[pos]);
 	if (args.size() == 0)
@@ -177,8 +176,8 @@ void savarsestef(const char* c, int pos)
 		return;
 	}
 
-	CreateDirectory((path).c_str(), nullptr);
-	CreateDirectory((path + "/" + args[0]).c_str(), nullptr);
+	std::filesystem::create_directory((path).c_str());
+	std::filesystem::create_directory((path + "/" + args[0]).c_str());
 
 	std::ofstream of((path + "/" + args[0] + "/" + "gat.txt").c_str());
 	if (args.size() >= 2)
@@ -260,7 +259,22 @@ void statutf(const char * c, int pos)
 	auto args = parseStrings(&c[pos]);
 	if (args.size() == 0)
 	{
-		std::ifstream f(".gat/adauga.txt");
+		std::ifstream f(".gat/config.txt");
+		if (!f.is_open())
+		{
+			elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+			return;
+		}
+
+		std::string name;
+		std::string path;
+		f >> name;
+		f >> path;
+		ilog("nume:", name);
+		ilog("poteca:", path);
+		f.close();
+
+		f.open(".gat/adauga.txt");
 		llog("Fisiere din adauga:");
 
 		while (!f.eof())
@@ -269,7 +283,7 @@ void statutf(const char * c, int pos)
 			std::getline(f, s);
 			if (s != "")
 			{
-				ilog(s);
+				glog(s);
 			}
 		}
 
