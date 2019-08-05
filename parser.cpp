@@ -69,6 +69,7 @@ void execute(Commands command, const char *c, int &pos)
 	switch (command)
 	{
 	case none:
+		sintaxaInvalida();
 		break;
 	case initiaza:
 		init(c, pos);

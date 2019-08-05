@@ -15,4 +15,5 @@ enum Commands
 void init(const char* c, int pos);
 void ajutorf(const char* c, int pos);
 void savarsestef(const char* c, int pos);
+void sintaxaInvalida();
 
