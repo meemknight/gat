@@ -1,10 +1,20 @@
 #include "gat.h"
+#include "parser.h"
+
 #include <iostream>
 
 
-void executeCommand(const std::string &line)
+void executeCommand(const char* line)
 {
 	
-	std::cout << line;
+	int pos = 0;
+	if (!validate(line, pos)) 
+	{
+		return;
+	};
+	
+	auto a = parseCommandType(line, pos);
+
+	execute(a, line, pos);
 
 }

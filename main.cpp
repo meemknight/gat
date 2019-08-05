@@ -10,14 +10,15 @@ int main(int args, const char* argv[])
 	
 	if(args <= 1)
 	{
-		std::string line{};
+		char line[300];
 		while (1)
 		{
 
-			std::getline(std::cin, line);
+			std::cin.getline(line, 250);
 
 			executeCommand(line);
 
+			ZeroMemory(line, 300);
 		}
 	}else
 	{

@@ -1,10 +1,11 @@
 #pragma once
+#include <iostream>
 
-
-enum class Commands
+enum Commands 
 {
 	none,
 	initiaza,
-	
-
+	CommandsSize,
 };
+
+void init();
