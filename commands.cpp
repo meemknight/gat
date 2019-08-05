@@ -31,10 +31,10 @@ void(*CommandsHelp[])() =
 {
 	[]() {sintaxaInvalida(); },
 	[]() {ilog("Initializeaza pravalia pentru cod.", "Declaratie: un-nou-inceput \"nume\" <facultativ>\"posizitie pravalie\""); },
-	[]() {ilog("Afiseaza ajutor pentru comenzi. ", "Declaratie: arata-mi-calea \"nume comanda\""); },
+	[]() {ilog("Afiseaza ajutor pentru comenzi. ", "Declaratie: arata-mi-calea <facultativ>\"nume comanda\""); },
 	[]() {ilog("Aceasta comanda urca noua versiune in pravalie", "Declaratie: savarseste \"nume savarsire\""); },
 	[]() {ilog("Aceasta comanda adauga fisiere pentru a fi bagate in pravalie", "Declaratie: adauga <nr nelimitat parametri>\"nume fisier\""); },
-	[]() {ilog("Aceasta comanda afiseaza fisierele care apar in adauga.txt", "Declaratie: statut"); },
+	[]() {ilog("Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire", "Declaratie: statut <facultativ>\"nume pivnita\""); },
 	[]() {ilog("Aceasta comanda scoate fisiere din pravalie", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
 	[]() {ilog("Sterge cu buretele", "Declaratie: scb"); },
 	[]() {},
@@ -62,7 +62,7 @@ void init(const char* c, int pos)
 
 	}
 
-	if(std::filesystem::exists(".gat//config.txt") || std::filesystem::exists(".gat//adauga.txt"))
+	if(std::filesystem::exists(".gat/config.txt") || std::filesystem::exists(".gat/adauga.txt"))
 	{
 		wlog("Pravalia deja exista");
 	}else
@@ -70,7 +70,7 @@ void init(const char* c, int pos)
 		std::string pravalie;
 		if(args.size() >= 2)
 		{
-			pravalie = args[1] + "//" + args[0];
+			pravalie = args[1] + "/" + args[0];
 		}else
 		{
 			pravalie = args[0];
@@ -83,11 +83,11 @@ void init(const char* c, int pos)
 			return;
 		};
 
-		std::ofstream f(".gat//config.txt");
+		std::ofstream f(".gat/config.txt");
 		f << args[0] << '\n' << pravalie;
 		f.close();
 
-		f.open(".gat//adauga.txt");
+		f.open(".gat/adauga.txt");
 		f.close();
 
 	}
@@ -114,7 +114,7 @@ void ajutorf(const char* c, int pos)
 
 void savarsestef(const char* c, int pos)
 {
-	std::cout << "savarseste\n";
+	std::cout << "in curs de savarsire...\n";
 
 	auto args = parseStrings(&c[pos]);
 	if (args.size() == 0)
@@ -125,7 +125,7 @@ void savarsestef(const char* c, int pos)
 	}
 
 	//verificare daca exista repository
-	std::ifstream f(".gat//config.txt");
+	std::ifstream f(".gat/config.txt");
 	if(!f.is_open())
 	{
 		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
@@ -141,7 +141,7 @@ void savarsestef(const char* c, int pos)
 
 	f.close();
 
-	f.open(".gat//adauga.txt");
+	f.open(".gat/adauga.txt");
 	if(!f.is_open())
 	{
 		elog("pravalie corupta");
@@ -175,9 +175,9 @@ void savarsestef(const char* c, int pos)
 	}
 
 	CreateDirectory((path).c_str(), nullptr);
-	CreateDirectory((path + "//" + args[0]).c_str(), nullptr);
+	CreateDirectory((path + "/" + args[0]).c_str(), nullptr);
 
-	std::ofstream of((path + "//" + args[0] + "//" + "gat.txt").c_str());
+	std::ofstream of((path + "/" + args[0] + "/" + "gat.txt").c_str());
 	if (args.size() >= 2)
 	{
 		of << args[1] << "\n";
@@ -191,12 +191,13 @@ void savarsestef(const char* c, int pos)
 	of.close();
 
 
-	for (auto &i : adaugari) 
+	for (auto &i : adaugari)
 	{
-		if(CopyFileA(i.c_str(), (path + "//" + args[0] + "//" + i).c_str(), false) != 0)
-		glog("Urcat fisierul: ", i);
+		if (CopyFileA(i.c_str(), (path + "/" + args[0] + "/" + i).c_str(), false) != 0)
+			glog("Urcat fisierul: ", i);
 	}
 
+	ilog("minune savarsita");
 }
 
 void adaugaf(const char *c, int pos)
@@ -211,14 +212,14 @@ void adaugaf(const char *c, int pos)
 		return;
 	}
 
-	if(!std::filesystem::exists(".gat//adauga.txt"))
+	if(!std::filesystem::exists(".gat/adauga.txt"))
 	{
 		elog("Pravalia nu exista. Foloseste un-nou-inceput");
 		return;
 	}
 
 	std::set<std::string> comenzi;
-	std::ifstream file(".gat//adauga.txt");
+	std::ifstream file(".gat/adauga.txt");
 		
 	while (!file.eof())
 	{
@@ -236,7 +237,7 @@ void adaugaf(const char *c, int pos)
 		comenzi.emplace(i);
 	}
 
-	std::ofstream of(".gat//adauga.txt");
+	std::ofstream of(".gat/adauga.txt");
 
 	for(auto &i: comenzi)
 	{
@@ -247,26 +248,75 @@ void adaugaf(const char *c, int pos)
 
 void statutf(const char * c, int pos)
 {
-	if (!std::filesystem::exists(".gat//adauga.txt"))
+	if (!std::filesystem::exists(".gat/adauga.txt"))
 	{
 		elog("Pravalia nu exista. Foloseste un-nou-inceput");
 		return;
 	}
 
-	std::ifstream f(".gat//adauga.txt");
-	llog("Fisiere din adauga:");
-
-	while (!f.eof())
+	auto args = parseStrings(&c[pos]);
+	if (args.size() == 0)
 	{
-		std::string s;
-		std::getline(f, s);
-		if (s != "")
+		std::ifstream f(".gat/adauga.txt");
+		llog("Fisiere din adauga:");
+
+		while (!f.eof())
 		{
-			ilog(s);
+			std::string s;
+			std::getline(f, s);
+			if (s != "")
+			{
+				ilog(s);
+			}
 		}
+
+		f.close();
+	}else
+	{
+		std::ifstream f(".gat/config.txt");
+		if (!f.is_open())
+		{
+			elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+			return;
+		}
+
+		std::string name;
+		std::string path;
+
+		f >> name;
+		///"cloud" path
+		f >> path;
+		f.close();
+		if(!std::filesystem::exists(name + "/" + args[0]))
+		{
+			elog("savarsirea nu exista");
+			return;
+		}
+
+		f.open(name + "/" + args[0] + "/gat.txt");
+		if (!f.is_open()) 
+		{
+			elog("savarsire corupta");
+			return;
+		}
+
+		std::string comment;
+		int date;
+
+		f >> comment;
+		f >> date;
+
+		f.close();
+
+		ilog(comment);
+		ilog(date);
+
+
 	}
 
-	f.close();
+	
+
+	
 
 }
 
