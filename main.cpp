@@ -4,10 +4,12 @@
 #include <iomanip>
 
 #include "gat.h"
+#include "parser.h"
 
 int main(int args, const char* argv[])
 {
-	
+
+
 	if(args <= 1)
 	{
 		char line[300];

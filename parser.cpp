@@ -1,4 +1,7 @@
 #include "parser.h"
+#include <algorithm>
+#include <sstream>
+#include <iterator>
 
 bool isBreakChar(char c)
 {
@@ -44,6 +47,11 @@ Commands getCommandType(std::string &s)
 
 Commands parseCommandType(const char *c, int &pos)
 {
+	if(c[pos] == 0)
+	{
+		return Commands::none;
+	}
+
 	for (; isBreakChar(c[pos]); pos++);
 	int endIt = pos;
 
@@ -74,4 +82,15 @@ void execute(Commands command, const char *c, int &pos)
 		break;
 	}
 
+}
+
+std::vector<std::string> parseStrings(std::string s)
+{
+	
+	std::istringstream iss(s);
+	std::vector<std::string> vect((std::istream_iterator<std::string>(iss)),
+		std::istream_iterator<std::string>());
+
+	
+	return vect;
 }
