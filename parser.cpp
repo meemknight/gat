@@ -95,6 +95,9 @@ void execute(Commands command, const char *c, int &pos)
 	case rastoarna:
 		rastoarnaf(c, pos);
 		break;
+	case compara:
+		comparaf(c, pos);
+		break;
 	case CommandsSize:
 		break;
 	default:

@@ -14,6 +14,7 @@ enum Commands
 	scoate,
 	scb,
 	rastoarna,
+	compara,
 	CommandsSize,
 };
 
@@ -26,3 +27,4 @@ void adaugaf(const char *c, int pos);
 void statutf(const char *c, int pos);
 void scoatef(const char *c, int pos);
 void rastoarnaf(const char *c, int pos);
+void comparaf(const char *c, int pos);

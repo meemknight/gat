@@ -11,7 +11,7 @@
 #include "analise.h"
 
 
-const char* CommandsNames[10] =
+const char* CommandsNames[11] =
 {
 "",
 "purcede",
@@ -22,6 +22,7 @@ const char* CommandsNames[10] =
 "scoate",
 "scb",
 "rastoarna",
+"compara",
 "", //end
 };
 
@@ -37,12 +38,13 @@ void(*CommandsHelp[])() =
 	[]() {llog("Afiseaza ajutor pentru comenzi. ", "Declaratie: arata-mi-calea <facultativ>\"nume comanda\""); },
 	[]() {llog("Aceasta comanda urca noua versiune in pravalie", "Declaratie: savarseste \"nume savarsire\""); },
 	[]() {llog("Aceasta comanda adauga fisiere pentru a fi bagate in pravalie", "Declaratie: adauga <nr nelimitat parametri>\"nume fisier\""); },
-	[]() {llog("Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire", "Declaratie: statut <facultativ>\"nume pivnita\""); },
-	[]() {llog("Aceasta comanda scoate fisiere din pravalie", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
-	[]() {llog("Sterge cu buretele", "Declaratie: scb"); },
-	[]() {llog("Intoarce la o savarsire mai vechie", "Declaratie: rastoarna \"nume savarsire\""); },
+	[]() {llog("Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire.", "Declaratie: statut <facultativ>\"nume pivnita\""); },
+	[]() {llog("Aceasta comanda scoate fisiere din pravalie.", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
+	[]() {llog("Sterge cu buretele.", "Declaratie: scb"); },
+	[]() {llog("Intoarce la o savarsire mai vechie.", "Declaratie: rastoarna \"nume savarsire\""); },
+	[]() {llog("Compara doua savarsiri.", "Declaratie: compara\"nume savarsire\" \"nume savarsire\""); },
 	[]() {},
-
+	
 };
 
 void init(const char* c, int pos)
@@ -70,8 +72,6 @@ void init(const char* c, int pos)
 		std::filesystem::create_directory(".gat");
 
 	}
-
-	
 
 	
 	std::string pravalie;
@@ -319,13 +319,13 @@ void statutf(const char * c, int pos)
 		///"cloud" path
 		f >> path;
 		f.close();
-		if(!std::filesystem::exists(name + "/" + args[0]))
+		if(!std::filesystem::exists(path + "/" + args[0]))
 		{
 			elog("savarsirea nu exista");
 			return;
 		}
 
-		f.open(name + "/" + args[0] + "/gat.txt");
+		f.open(path + "/" + args[0] + "/gat.txt");
 		if (!f.is_open()) 
 		{
 			elog("savarsire corupta");
@@ -427,8 +427,6 @@ void rastoarnaf(const char * c, int pos)
 		return;
 	}
 
-	
-
 	std::string name;
 	std::string path;
 
@@ -481,5 +479,40 @@ void rastoarnaf(const char * c, int pos)
 	}
 
 	llog("Fisiere rasturnate");
+
+}
+
+void comparaf(const char *c, int pos)
+{
+	auto args = parseStrings(&c[pos]);
+	if (args.size() < 2)
+	{
+		sintaxaInvalida();
+		CommandsHelp[Commands::compara]();
+		return;
+	}
+
+	//verificare daca exista repository
+	std::ifstream f(".gat/config.txt");
+	if (!f.is_open())
+	{
+		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		return;
+	}
+
+	std::string name;
+	std::string path;
+	f >> name;
+	f >> path;
+
+	f.close();
+
+	if(!std::filesystem::exists(path + "/" + args[0]) || !std::filesystem::exists(path + "/" + args[1]))
+	{
+		elog("savarsire gresita");
+		return;
+	}
+
+	compareReps(path + "/" + args[0], path + "/" + args[1]);
 
 }

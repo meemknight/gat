@@ -34,14 +34,14 @@ void analiseLastTwo(std::string path, std::string root)
 	std::string r1 = root + "/" + pathes[size - 2];
 	std::string r2 = root + "/" + pathes[size - 1];
 
-	compareReps(r1, r2, pathes[size - 2], pathes[size - 1]);
+	compareReps(r1, r2);
 
 	f.close();
 
 }
 
 
-void compareReps(std::string p1, std::string p2, std::string name1, std::string name2)
+void compareReps(std::string p1, std::string p2)
 {
 
 	std::vector<fs::directory_entry> files1;
@@ -128,7 +128,7 @@ void compareReps(std::string p1, std::string p2, std::string name1, std::string 
 	//new
 	for(int i=0; i<files2.size(); i++)
 	{
-		glog("new:",files2[i].path().filename(), "marimi:", fs::file_size(files2[i]));
+		glog("new:",files2[i].path().filename(), "marime:", fs::file_size(files2[i]));
 	}
 
 }
