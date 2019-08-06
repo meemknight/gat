@@ -46,13 +46,13 @@ void(*CommandsHelp[])() =
 	[]() {llog("Aceasta comanda afiseaza fisierele care apar in adauga.txt sau informatii despre o savarsire.", "Declaratie: statut <facultativ>\"nume pivnita\""); },
 	[]() {llog("Aceasta comanda scoate fisiere din pravalie.", "Declaratie: scoate <nr nelimitat parametri>\"nume fisier\""); },
 	[]() {llog("Sterge cu buretele.", "Declaratie: scb"); },
-	[]() {llog("Intoarce la o savarsire mai vechie.", "Declaratie: rastoarna \"nume savarsire\" <facultativ>\"comentariu\""); },
+	[]() {llog("Intoarce la o savarsire mai vechie.", "Declaratie: rastoarna \"nume savarsire\""); },
 	[]() {llog("Compara doua savarsiri.", "Declaratie: compara\"nume savarsire\" \"nume savarsire\""); },
 	[]() {llog("Afiseaza toate savarsirile.", "Declaratie: istorie"); },
 	[]() {llog("Schimba ramura.", "Declaratie: ramura \"ramura\""); },
 	[]() {llog("Adauga o ramura.", "Declaratie: adauga-ramura \"ramura\" <facultativ>\"cale\""); },
 	[]() {llog("Afiseaza toate ramurile.", "Declaratie: afiseaza-ramuri"); },
-	[]() {llog("Cloneaza in ramura curenta ultima savarsire din ramura aleaza.", "Declaratie: cloneaza \"ramura\" <facultativ>\"comentariu\""); },
+	[]() {llog("Cloneaza in ramura curenta ultima savarsire din ramura aleaza.", "Declaratie: cloneaza \"ramura\""); },
 	[]() {},
 	
 };
@@ -820,29 +820,10 @@ void unestef(const char * c, int pos)
 				return;
 			}
 
-			std::string fullcommitPath = b + "/" + commitPath;
+			commitPath = b + "/" + commitPath;
 
-			std::filesystem::create_directory(workingDir + "/" + commitPath);
-			std::filesystem::copy(fullcommitPath.c_str(), workingDir + "/" + commitPath);
+			std::filesystem::copy(commitPath, workingDir);
 
-			std::ofstream out(workingDir + "/gat.txt", std::ios::app);
-			out << commitPath << "\n";
-			out.close();
-
-			out.open(workingDir + "/" + commitPath + "/gat.txt");
-
-			if (args.size() < 2)
-			{
-				out << "...";
-			}else
-			{
-				out << args[1];
-			}
-
-			out << "\n" << time(0);
-
-			out.close();
-			glog("ne-am unit");
 			return;
 		}
 	}

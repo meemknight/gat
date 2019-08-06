@@ -19,6 +19,7 @@ enum Commands
 	ramura,
 	adaugaRamura,
 	afiseazaRamuri,
+	uneste,
 	CommandsSize,
 };
 
@@ -36,3 +37,4 @@ void istorief(const char *c, int pos);
 void ramuraf(const char *c, int pos);
 void adaugaRamuraf(const char *c, int pos);
 void afiseazaRamurif(const char *c, int pos);
+void unestef(const char *c, int pos);
