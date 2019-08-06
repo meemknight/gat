@@ -105,6 +105,9 @@ void init(const char* c, int pos)
 	f.open(".gat/adauga.txt");
 	f.close();
 
+	f.open(".gat/ignora.txt");
+	f.close();
+
 	f.open(pravalie + "/gat.txt");
 
 	f.close();
@@ -214,6 +217,24 @@ void savarsestef(const char* c, int pos)
 
 	of.close();
 
+	std::set<std::string> ignorari;
+	f.open(".gat/ignora.txt");
+	if(f.is_open())
+	{
+		std::string s;
+		f >> s;
+		ignorari.emplace(s);
+		f.close();
+	}
+
+	for(auto &i: ignorari)
+	{
+		if(adaugari.find(i) != adaugari.end())
+		{
+			adaugari.erase(adaugari.find(i));
+		}
+	}
+
 	for (auto &i : adaugari)
 	{
 		if (CopyFileA(i.c_str(), (path + "/" + args[0] + "/" + i).c_str(), false) != 0);
@@ -296,6 +317,24 @@ void adaugaf(const char *c, int pos)
 		else
 		{
 			comenzi.emplace(i);
+		}
+	}
+
+	std::set<std::string> ignorari;
+	f.open(".gat/ignora.txt");
+	if (f.is_open())
+	{
+		std::string s;
+		f >> s;
+		ignorari.emplace(s);
+		f.close();
+	}
+
+	for (auto &i : ignorari)
+	{
+		if (comenzi.find(i) != comenzi.end())
+		{
+			comenzi.erase(comenzi.find(i));
 		}
 	}
 
