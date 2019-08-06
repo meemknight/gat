@@ -18,6 +18,7 @@ enum Commands
 	istorie,
 	ramura,
 	adaugaRamura,
+	afiseazaRamuri,
 	CommandsSize,
 };
 
@@ -34,3 +35,4 @@ void comparaf(const char *c, int pos);
 void istorief(const char *c, int pos);
 void ramuraf(const char *c, int pos);
 void adaugaRamuraf(const char *c, int pos);
+void afiseazaRamurif(const char *c, int pos);

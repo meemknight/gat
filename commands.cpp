@@ -11,7 +11,7 @@
 #include "analise.h"
 
 
-const char* CommandsNames[14] =
+const char* CommandsNames[15] =
 {
 "",
 "purcede",
@@ -26,6 +26,7 @@ const char* CommandsNames[14] =
 "istorie",
 "ramura",
 "inramureste",
+"afiseaza-ramuri",
 "", //end
 };
 
@@ -49,6 +50,7 @@ void(*CommandsHelp[])() =
 	[]() {llog("Afiseaza toate savarsirile.", "Declaratie: istorie"); },
 	[]() {llog("Schimba ramura.", "Declaratie: ramura \"ramura\""); },
 	[]() {llog("Adauga o ramura.", "Declaratie: adauga-ramura \"ramura\" <facultativ>\"cale\""); },
+	[]() {llog("Afiseaza toate ramurile.", "Declaratie: afiseaza-ramuri"); },
 	[]() {},
 	
 };
@@ -734,5 +736,25 @@ void adaugaRamuraf(const char *c, int pos)
 
 	glog("ramura materializata");
 
+
+}
+
+void afiseazaRamurif(const char * c, int pos)
+{
+	if (!std::filesystem::exists(".gat/config.txt") || !std::filesystem::exists(".gat/ramuri.txt"))
+	{
+		wlog("Pravalia nu exista. Foloseste purcede.");
+		return;
+	}
+
+	std::ifstream in(".gat/ramuri.txt");
+	llog("Ramuri:     Carari:");
+
+	while(!in.eof())
+	{
+		std::string a, b;
+		in >> a >> b;
+		wlog(a, b);
+	}
 
 }

@@ -13,4 +13,3 @@ Funcții:
 * compara "nume savarsire" "nume savarsire": Compară două săvârșiri.
 * ramura "nume ramura": Schimba ramura.
 * inramureste "nume ramura" <facultativ>"poziție prăvălie": Creaza o ramura noua.
-* afiseaza-ramuri: Afiseaza toate ramurile.

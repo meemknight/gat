@@ -109,6 +109,8 @@ void execute(Commands command, const char *c, int &pos)
 		break;
 	case adaugaRamura:
 		adaugaRamuraf(c, pos);
+	case afiseazaRamuri:
+		afiseazaRamurif(c, pos);
 		break;
 	case CommandsSize:
 		break;
