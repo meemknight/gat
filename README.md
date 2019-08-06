@@ -11,3 +11,5 @@ Funcții:
 * scb: Sterge cu buretele.
 * rastoarna "nume savarsire": Intoarce la o savarsire mai vechie.
 * compara "nume savarsire" "nume savarsire": Compară două săvârșiri.
+* ramura "nume ramura": Schimba ramura.
+* inramureste "nume ramura" <facultativ>"poziție prăvălie": Creaza o ramura noua.
