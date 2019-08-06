@@ -8,11 +8,12 @@
 #include <filesystem>
 #include <chrono>
 #include <set>
+#include "analise.h"
 
 const char* CommandsNames[10] =
 {
 "",
-"un-nou-inceput",
+"purcede",
 "arata-mi-calea",
 "savarseste",
 "adauga",
@@ -31,7 +32,7 @@ void sintaxaInvalida()
 void(*CommandsHelp[])() =
 {
 	[]() {sintaxaInvalida(); },
-	[]() {llog("Initializeaza pravalia pentru cod.", "Declaratie: un-nou-inceput \"nume\" <facultativ>\"posizitie pravalie\""); },
+	[]() {llog("Initializeaza pravalia pentru cod.", "Declaratie: purcede \"nume\" <facultativ>\"posizitie pravalie\""); },
 	[]() {llog("Afiseaza ajutor pentru comenzi. ", "Declaratie: arata-mi-calea <facultativ>\"nume comanda\""); },
 	[]() {llog("Aceasta comanda urca noua versiune in pravalie", "Declaratie: savarseste \"nume savarsire\""); },
 	[]() {llog("Aceasta comanda adauga fisiere pentru a fi bagate in pravalie", "Declaratie: adauga <nr nelimitat parametri>\"nume fisier\""); },
@@ -45,6 +46,12 @@ void(*CommandsHelp[])() =
 
 void init(const char* c, int pos)
 {
+
+	if (std::filesystem::exists(".gat/config.txt") || std::filesystem::exists(".gat/adauga.txt"))
+	{
+		wlog("Pravalia deja exista");
+		return;
+	}
 
 	auto args = parseStrings(&c[pos]);
 
@@ -63,35 +70,35 @@ void init(const char* c, int pos)
 
 	}
 
-	if(std::filesystem::exists(".gat/config.txt") || std::filesystem::exists(".gat/adauga.txt"))
+	
+
+	
+	std::string pravalie;
+	if(args.size() >= 2)
 	{
-		wlog("Pravalia deja exista");
+		pravalie = args[1] + "/" + args[0];
 	}else
 	{
-		std::string pravalie;
-		if(args.size() >= 2)
-		{
-			pravalie = args[1] + "/" + args[0];
-		}else
-		{
-			pravalie = args[0];
-		}
-
-		if(GetFileAttributes(pravalie.c_str()) == INVALID_FILE_ATTRIBUTES)
-		if (!std::filesystem::create_directory(pravalie.c_str()))
-		{
-			elog("locatie pravalie invalida");
-			return;
-		};
-
-		std::ofstream f(".gat/config.txt");
-		f << args[0] << '\n' << pravalie;
-		f.close();
-
-		f.open(".gat/adauga.txt");
-		f.close();
-
+		pravalie = args[0];
 	}
+
+	if(GetFileAttributes(pravalie.c_str()) == INVALID_FILE_ATTRIBUTES)
+	if (!std::filesystem::create_directory(pravalie.c_str()))
+	{
+		elog("locatie pravalie invalida");
+		return;
+	};
+
+	std::ofstream f(".gat/config.txt");
+	f << args[0] << '\n' << pravalie;
+	f.close();
+
+	f.open(".gat/adauga.txt");
+	f.close();
+
+	f.open(pravalie + "/gat.txt");
+
+	f.close();
 
 };
 
@@ -192,14 +199,21 @@ void savarsestef(const char* c, int pos)
 
 	of.close();
 
-
 	for (auto &i : adaugari)
 	{
 		if (CopyFileA(i.c_str(), (path + "/" + args[0] + "/" + i).c_str(), false) != 0)
 			glog("Urcat fisierul: ", i);
 	}
 
+	of.open(path + "/gat.txt", std::ios::app);
+
+	of << args[0] << "\n";
+
+	of.close();
+
 	ilog("minune savarsita");
+
+	analiseLastTwo(path + "/gat.txt", path);
 }
 
 void adaugaf(const char *c, int pos)
@@ -318,14 +332,20 @@ void statutf(const char * c, int pos)
 		}
 
 		std::string comment;
-		int date;
+		int d;
 
 		f >> comment;
-		f >> date;
+		f >> d;
 
 		f.close();
 
 		ilog(comment);
+
+		time_t t = d;
+		struct tm *tm = localtime(&t);
+		char date[20];
+		strftime(date, sizeof(date), "%Y-%m-%d %H:%M:%S", tm);
+
 		ilog(date);
 
 
@@ -371,7 +391,12 @@ void scoatef(const char * c, int pos)
 
 	for(auto &i: args)
 	{
-		comenzi.erase(comenzi.find(i));
+		auto it = comenzi.find(i);
+		if(it != comenzi.end())
+		{
+			comenzi.erase(it);
+		}
+
 	}
 
 	std::ofstream f(".gat//adauga.txt");
