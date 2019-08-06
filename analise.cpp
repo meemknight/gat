@@ -50,11 +50,13 @@ void compareReps(std::string p1, std::string p2)
 
 	for (const auto & entry : fs::directory_iterator(p1))
 	{
+		if(entry.path().filename() != "gat.txt")
 		files1.push_back(entry);
 	}
 
 	for (const auto & entry : fs::directory_iterator(p2))
 	{
+		if (entry.path().filename() != "gat.txt")
 		files2.push_back(entry);
 	}
 

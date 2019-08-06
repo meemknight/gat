@@ -47,12 +47,15 @@ Commands getCommandType(std::string &s)
 
 Commands parseCommandType(const char *c, int &pos)
 {
-	if(c[pos] == 0)
+
+	for (; isBreakChar(c[pos]); pos++)
 	{
-		return Commands::none;
+		if(c[pos] == 0)
+		{
+			return Commands::none;
+		}
 	}
 
-	for (; isBreakChar(c[pos]); pos++);
 	int endIt = pos;
 
 	for (; !isBreakChar(c[endIt]); endIt++);

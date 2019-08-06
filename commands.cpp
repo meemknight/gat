@@ -67,7 +67,6 @@ void init(const char* c, int pos)
 
 	if(GetFileAttributes(".gat") == INVALID_FILE_ATTRIBUTES)
 	{
-		llog("niciun director gasit, creand unul...");
 
 		std::filesystem::create_directory(".gat");
 
@@ -100,6 +99,8 @@ void init(const char* c, int pos)
 	f.open(pravalie + "/gat.txt");
 
 	f.close();
+
+	elog("pravalie materializata");
 
 };
 
@@ -212,14 +213,13 @@ void savarsestef(const char* c, int pos)
 
 	of.close();
 
-	ilog("minune savarsita");
+	glog("minune savarsita", "\n");
 
 	analiseLastTwo(path + "/gat.txt", path);
 }
 
 void adaugaf(const char *c, int pos)
 {
-	llog("adauga...");
 
 	auto args = parseStrings(&c[pos]);
 	if (args.size() == 0)
@@ -235,6 +235,23 @@ void adaugaf(const char *c, int pos)
 		return;
 	}
 
+
+	std::ifstream f(".gat/config.txt");
+	if (!f.is_open())
+	{
+		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		return;
+	}
+	llog("adauga...");
+
+	std::string name;
+	std::string path;
+
+	f >> name;
+	///"cloud" path
+	f >> path;
+	f.close();
+
 	std::set<std::string> comenzi;
 	std::ifstream file(".gat/adauga.txt");
 		
@@ -244,14 +261,29 @@ void adaugaf(const char *c, int pos)
 		std::getline(file, s);
 		if (s != "")
 		{
+	
 			comenzi.emplace(std::move(s));
+			
 		}
 	}
 	file.close();
 
 	for(auto &i: args)
 	{
-		comenzi.emplace(i);
+		auto pos = i.find("*");
+		if (pos != std::string::npos)
+		{
+			std::string extension(&i[pos + 1]);
+			for (const auto & entry : std::filesystem::directory_iterator(""))
+			{
+				if (entry.path().filename().extension() == extension)
+					comenzi.emplace(entry.path().filename().string());
+			}
+		}
+		else
+		{
+			comenzi.emplace(i);
+		}
 	}
 
 	std::ofstream of(".gat/adauga.txt");
@@ -360,7 +392,6 @@ void statutf(const char * c, int pos)
 
 void scoatef(const char * c, int pos)
 {
-	llog("scoate...");
 	auto args = parseStrings(&c[pos]);
 	if (args.size() == 0)
 	{
@@ -374,6 +405,8 @@ void scoatef(const char * c, int pos)
 		elog("Pravalia nu exista. Foloseste un-nou-inceput");
 		return;
 	}
+
+	llog("scoate...");
 
 	std::ifstream file(".gat//adauga.txt");
 	std::set<std::string> comenzi;
