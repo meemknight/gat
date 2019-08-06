@@ -17,6 +17,14 @@
 #include <Windows.h>
 #include <sstream>
 
+extern char retC;
+
+inline void setRetChar(char c)
+{
+	retC = c;
+}
+
+
 #define FORCE_LOG
 
 #ifdef _DEBUG
@@ -36,7 +44,7 @@
 #ifdef FORCE_LOG
 inline void llog()
 {
-	std::cout << "\n";
+	std::cout << retC;
 }
 
 template<class F, class ...T>
@@ -57,7 +65,7 @@ inline void llog(F f, T ...args)
 #ifdef FORCE_LOG
 inline void wlog()
 {
-	std::cout << "\n";
+	std::cout << retC;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
 
@@ -80,7 +88,7 @@ inline void wlog(F f, T ...args)
 #ifdef FORCE_LOG
 inline void ilog()
 {
-	std::cout << "\n";
+	std::cout << retC;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
 
@@ -103,7 +111,7 @@ inline void ilog(F f, T ...args)
 #ifdef FORCE_LOG
 inline void glog()
 {
-	std::cout << "\n";
+	std::cout << retC;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
 
@@ -126,7 +134,7 @@ inline void glog(F f, T ...args)
 #ifdef FORCE_LOG
 inline void elog()
 {
-	std::cout << "\n";
+	std::cout << retC;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 }
 

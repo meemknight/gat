@@ -10,6 +10,7 @@
 #include <set>
 #include "analise.h"
 
+
 const char* CommandsNames[10] =
 {
 "",
