@@ -96,8 +96,7 @@ void compareReps(std::string p1, std::string p2)
 				setRetChar(0);
 				wlog("removed:", files1[i].path().filename(), -delta, "bytes");
 				float percent = (float)size2 * 100.f / (float)size1;
-				percent /= 100;
-				percent = 1.f - percent;
+				percent /= 100.f;
 				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 10);
 				for(int i=0; i<floor(percent * 10); i++)
 				{
