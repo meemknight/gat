@@ -11,7 +11,7 @@
 #include "analise.h"
 
 
-const char* CommandsNames[11] =
+const char* CommandsNames[12] =
 {
 "",
 "purcede",
@@ -23,6 +23,7 @@ const char* CommandsNames[11] =
 "scb",
 "rastoarna",
 "compara",
+"istorie",
 "", //end
 };
 
@@ -43,6 +44,7 @@ void(*CommandsHelp[])() =
 	[]() {llog("Sterge cu buretele.", "Declaratie: scb"); },
 	[]() {llog("Intoarce la o savarsire mai vechie.", "Declaratie: rastoarna \"nume savarsire\""); },
 	[]() {llog("Compara doua savarsiri.", "Declaratie: compara\"nume savarsire\" \"nume savarsire\""); },
+	[]() {llog("Afiseaza toate savarsirile.", "Declaratie: istorie"); },
 	[]() {},
 	
 };
@@ -203,8 +205,8 @@ void savarsestef(const char* c, int pos)
 
 	for (auto &i : adaugari)
 	{
-		if (CopyFileA(i.c_str(), (path + "/" + args[0] + "/" + i).c_str(), false) != 0)
-			glog("Urcat fisierul: ", i);
+		if (CopyFileA(i.c_str(), (path + "/" + args[0] + "/" + i).c_str(), false) != 0);
+			//glog("Urcat fisierul: ", i);
 	}
 
 	of.open(path + "/gat.txt", std::ios::app);
@@ -547,5 +549,55 @@ void comparaf(const char *c, int pos)
 	}
 
 	compareReps(path + "/" + args[0], path + "/" + args[1]);
+
+}
+
+void istorief(const char * c, int pos)
+{
+	if (!std::filesystem::exists(".gat/adauga.txt"))
+	{
+		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		return;
+	}
+
+	std::ifstream f(".gat/config.txt");
+	if (!f.is_open())
+	{
+		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		return;
+	}
+
+	std::string name;
+	std::string path;
+	f >> name;
+	f >> path;
+
+	f.close();
+
+	f.open(path + "/gat.txt");
+	if (!f.is_open())
+	{
+		elog("savarsire corupta");
+		return;
+	}
+
+	std::vector<std::string> savarsiri;
+
+	while (!f.eof())
+	{
+		std::string s;
+		std::getline(f, s);
+		if (s != "")
+		{
+			savarsiri.push_back(std::move(s));
+		}
+	}
+	f.close();
+	
+	llog();
+	for(auto &i : savarsiri)
+	{
+		llog(i);
+	}
 
 }
