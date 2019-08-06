@@ -14,3 +14,4 @@ Funcții:
 * ramura "nume ramura": Schimba ramura.
 * inramureste "nume ramura" <facultativ>"poziție prăvălie": Creaza o ramura noua.
 * afiseaza-ramuri: Afiseaza toate ramurile.
+* uneste "nume ramura" <facultativ>"comentariu": Cloneaza in ramura curenta ultima savarsire din ramura aleaza.
