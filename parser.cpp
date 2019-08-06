@@ -104,6 +104,12 @@ void execute(Commands command, const char *c, int &pos)
 	case istorie:
 		istorief(c, pos);
 		break;
+	case ramura:
+		ramuraf(c, pos);
+		break;
+	case adaugaRamura:
+		adaugaRamuraf(c, pos);
+		break;
 	case CommandsSize:
 		break;
 	default:

@@ -11,7 +11,7 @@
 #include "analise.h"
 
 
-const char* CommandsNames[12] =
+const char* CommandsNames[14] =
 {
 "",
 "purcede",
@@ -24,6 +24,8 @@ const char* CommandsNames[12] =
 "rastoarna",
 "compara",
 "istorie",
+"ramura",
+"inramureste",
 "", //end
 };
 
@@ -45,6 +47,8 @@ void(*CommandsHelp[])() =
 	[]() {llog("Intoarce la o savarsire mai vechie.", "Declaratie: rastoarna \"nume savarsire\""); },
 	[]() {llog("Compara doua savarsiri.", "Declaratie: compara\"nume savarsire\" \"nume savarsire\""); },
 	[]() {llog("Afiseaza toate savarsirile.", "Declaratie: istorie"); },
+	[]() {llog("Schimba ramura.", "Declaratie: ramura \"ramura\""); },
+	[]() {llog("Adauga o ramura.", "Declaratie: adauga-ramura \"ramura\" <facultativ>\"cale\""); },
 	[]() {},
 	
 };
@@ -73,7 +77,6 @@ void init(const char* c, int pos)
 		std::filesystem::create_directory(".gat");
 
 	}
-
 	
 	std::string pravalie;
 	if(args.size() >= 2)
@@ -102,7 +105,11 @@ void init(const char* c, int pos)
 
 	f.close();
 
-	elog("pravalie materializata");
+	f.open(".gat/ramuri.txt");
+	f << "maiestru " << pravalie << "\n";
+	f.close();
+
+	glog("pravalie materializata");
 
 };
 
@@ -139,7 +146,7 @@ void savarsestef(const char* c, int pos)
 	std::ifstream f(".gat/config.txt");
 	if(!f.is_open())
 	{
-		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		elog("pravalia nu a fost creata. Incearca gat purcede");
 		return;
 	}
 
@@ -233,7 +240,7 @@ void adaugaf(const char *c, int pos)
 
 	if(!std::filesystem::exists(".gat/adauga.txt"))
 	{
-		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		elog("Pravalia nu exista. Foloseste purcede");
 		return;
 	}
 
@@ -241,7 +248,7 @@ void adaugaf(const char *c, int pos)
 	std::ifstream f(".gat/config.txt");
 	if (!f.is_open())
 	{
-		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		elog("pravalia nu a fost creata. Incearca gat purcede");
 		return;
 	}
 	llog("adauga...");
@@ -301,7 +308,7 @@ void statutf(const char * c, int pos)
 {
 	if (!std::filesystem::exists(".gat/adauga.txt"))
 	{
-		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		elog("Pravalia nu exista. Foloseste purcede");
 		return;
 	}
 
@@ -311,7 +318,7 @@ void statutf(const char * c, int pos)
 		std::ifstream f(".gat/config.txt");
 		if (!f.is_open())
 		{
-			elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+			elog("pravalia nu a fost creata. Incearca gat purcede");
 			return;
 		}
 
@@ -342,7 +349,7 @@ void statutf(const char * c, int pos)
 		std::ifstream f(".gat/config.txt");
 		if (!f.is_open())
 		{
-			elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+			elog("pravalia nu a fost creata. Incearca gat purcede");
 			return;
 		}
 
@@ -404,7 +411,7 @@ void scoatef(const char * c, int pos)
 
 	if (!std::filesystem::exists(".gat//adauga.txt"))
 	{
-		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		elog("Pravalia nu exista. Foloseste purcede");
 		return;
 	}
 
@@ -458,7 +465,7 @@ void rastoarnaf(const char * c, int pos)
 	std::ifstream f(".gat/config.txt");
 	if (!f.is_open())
 	{
-		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		elog("pravalia nu a fost creata. Incearca gat purcede");
 		return;
 	}
 
@@ -531,7 +538,7 @@ void comparaf(const char *c, int pos)
 	std::ifstream f(".gat/config.txt");
 	if (!f.is_open())
 	{
-		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		elog("pravalia nu a fost creata. Incearca gat purcede");
 		return;
 	}
 
@@ -556,14 +563,14 @@ void istorief(const char * c, int pos)
 {
 	if (!std::filesystem::exists(".gat/adauga.txt"))
 	{
-		elog("Pravalia nu exista. Foloseste un-nou-inceput");
+		elog("Pravalia nu exista. Foloseste purcede");
 		return;
 	}
 
 	std::ifstream f(".gat/config.txt");
 	if (!f.is_open())
 	{
-		elog("pravalia nu a fost creata. Incearca gat un-nou-inceput");
+		elog("pravalia nu a fost creata. Incearca gat purcede");
 		return;
 	}
 
@@ -599,5 +606,133 @@ void istorief(const char * c, int pos)
 	{
 		llog(i);
 	}
+
+}
+
+void ramuraf(const char * c, int pos)
+{
+	auto args = parseStrings(&c[pos]);
+
+	if (args.size() < 1)
+	{
+		sintaxaInvalida();
+		CommandsHelp[Commands::ramura]();
+		return;
+	}
+
+	std::ifstream f(".gat/ramuri.txt");
+	if (!f.is_open())
+	{
+		elog("pravalia nu a fost creata. Incearca gat purcede");
+		return;
+	}
+
+	//nume cale
+
+	while(!f.eof())
+	{
+		std::string ramura;
+		std::string cale;
+
+		f >> ramura >> cale;
+	
+		if(ramura == args[0])
+		{
+			
+			std::ifstream original(".gat/config.txt");
+			if(!original.is_open())
+			{
+				elog("pravalie corupta");
+				original.close();
+				f.close();
+				return;
+			}
+			
+			std::string nume;
+			original >> nume;
+			original.close();
+			f.close();
+
+			std::ofstream nou(".gat/config.txt");
+			nou << nume << "\n" << cale;
+			glog("sarit pe ramura " + ramura +" cu succes");
+			return;
+		}
+
+	}
+	f.close();
+	elog("ramura nu exista");
+
+}
+
+void adaugaRamuraf(const char *c, int pos)
+{
+
+	if (!std::filesystem::exists(".gat/config.txt") || !std::filesystem::exists(".gat/adauga.txt"))
+	{
+		wlog("Pravalia nu exista. Foloseste purcede.");
+		return;
+	}
+
+	auto args = parseStrings(&c[pos]);
+
+	if (args.size() < 1)
+	{
+		sintaxaInvalida();
+		CommandsHelp[Commands::adaugaRamura]();
+		return;
+	}
+
+	std::string pravalie;
+	if (args.size() >= 2)
+	{
+		pravalie = args[1] + "/" + args[0];
+	}
+	else
+	{
+		pravalie = args[0];
+	}
+
+	if (GetFileAttributes(pravalie.c_str()) == INVALID_FILE_ATTRIBUTES)
+		if (!std::filesystem::create_directory(pravalie.c_str()))
+		{
+			elog("locatie pravalie invalida");
+			return;
+		};
+
+	std::ifstream inramuri(".gat/ramuri.txt");
+	std::vector<std::pair<std::string, std::string>> ramuri;
+
+	while(!inramuri.eof())
+	{
+		std::string a, b;
+		inramuri >> a >> b;
+		if(a == args[0])
+		{
+			elog("ramura deja exista");
+			inramuri.close();
+			return;
+		}
+	}
+
+	std::ofstream f(".gat/ramuri.txt", std::ios::app);
+	f << args[0] << " " << pravalie << "\n";
+	f.close();
+
+	f.open(pravalie + "/gat.txt");
+	f.close();
+	
+
+	//schimba ramura
+	std::ifstream in(".gat/config.txt");
+	std::string name;
+	in >> name;
+	in.close();
+
+	f.open(".gat/config.txt");
+	f << name << "\n" << pravalie;
+
+	glog("ramura materializata");
+
 
 }

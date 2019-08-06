@@ -16,6 +16,8 @@ enum Commands
 	rastoarna,
 	compara,
 	istorie,
+	ramura,
+	adaugaRamura,
 	CommandsSize,
 };
 
@@ -30,3 +32,5 @@ void scoatef(const char *c, int pos);
 void rastoarnaf(const char *c, int pos);
 void comparaf(const char *c, int pos);
 void istorief(const char *c, int pos);
+void ramuraf(const char *c, int pos);
+void adaugaRamuraf(const char *c, int pos);
