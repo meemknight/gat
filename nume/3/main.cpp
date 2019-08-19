@@ -2,15 +2,14 @@
 #include <Windows.h>
 #include <filesystem>
 #include <iomanip>
-#include <sstream>
 
 #include "gat.h"
 #include "parser.h"
 
-int main(int argc, const char* argv[])
+int main(int args, const char* argv[])
 {
 
-	if(argc <= 1)
+	if(args <= 1)
 	{
 		char line[300];
 		while (1)
@@ -24,14 +23,10 @@ int main(int argc, const char* argv[])
 		}
 	}else
 	{
-		std::stringstream stream;
-
-		for(int i=1; i< argc; i++)
+		for(int i=1; i<args; i++)
 		{
-			stream << argv[i] << ' ';
+			executeCommand(argv[i]);
 		}
-
-		executeShellCommand(stream.str().c_str());
 	
 	}
 
